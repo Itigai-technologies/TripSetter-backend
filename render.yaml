@@ -4,6 +4,7 @@ services:
     name: django-travel-api
     env: python
     plan: free
+    runtime: python
     buildCommand: |
       apt-get update && apt-get install -y libxml2-dev libxslt1-dev python3-dev gcc build-essential
       pip install --upgrade pip setuptools wheel
@@ -16,7 +17,7 @@ services:
       python manage.py migrate
       python manage.py collectstatic --noinput
       python manage.py setup_media
-    startCommand: "cd /opt/render/project/src && gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 config.wsgi:application"
+    startCommand: "gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 wsgi:application"
     envVars:
       - key: SECRET_KEY
         generateValue: true
@@ -32,6 +33,10 @@ services:
         value: "/opt/render/project/src"
       - key: DJANGO_SETTINGS_MODULE
         value: "config.settings"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: GUNICORN_CMD_ARGS
+        value: "--bind=0.0.0.0:$PORT --workers=2 --timeout=120"
 
 databases:
   # PostgreSQL Database
