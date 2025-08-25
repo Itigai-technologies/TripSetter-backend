@@ -43,7 +43,7 @@ THIRD_PARTY_APPS = [
     'drf_spectacular',
     'django_filters',
     'import_export',
-    'admin_honeypot',
+    # 'admin_honeypot',  # Replaced with custom implementation
 ]
 
 LOCAL_APPS = [
