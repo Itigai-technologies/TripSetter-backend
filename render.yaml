@@ -5,6 +5,11 @@ services:
     env: python
     plan: free
     runtime: python
+    buildFilter:
+      paths:
+        - "requirements.txt"
+        - "manage.py"
+        - "app.py"
     buildCommand: |
       apt-get update && apt-get install -y libxml2-dev libxslt1-dev python3-dev gcc build-essential
       pip install --upgrade pip setuptools wheel
@@ -17,7 +22,10 @@ services:
       python manage.py migrate
       python manage.py collectstatic --noinput
       python manage.py setup_media
-    startCommand: "gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 wsgi:application"
+      echo "Build completed successfully"
+      echo "Python path: $PYTHONPATH"
+      echo "Django settings: $DJANGO_SETTINGS_MODULE"
+    startCommand: "gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 app:app"
     envVars:
       - key: SECRET_KEY
         generateValue: true
