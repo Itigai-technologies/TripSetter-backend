@@ -655,6 +655,45 @@ def update_tour(request, user_id, tour_id):
             'message': f'An error occurred: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_tour(request, user_id, tour_id):
+    """
+    Delete an existing tour
+    """
+    try:
+        # Get the tour object
+        tour = Tour.objects.get(Tour, id=tour_id, partner__user_id=user_id)
+        
+        # Check if user has permission to delete this tour
+        if not (request.user.id == user_id or request.user.is_staff):
+            return Response(
+                {"error": "You don't have permission to delete this tour"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Store tour info before deletion
+        tour_info = {
+            "id": tour.id,
+            "title": getattr(tour, 'title', f"Tour {tour.id}"),
+            "message": "Tour deleted successfully"
+        }
+        
+        # Delete the tour
+        tour.delete()
+        
+        return Response(tour_info, status=status.HTTP_200_OK)
+        
+    except Tour.DoesNotExist:
+        return Response(
+            {"error": "Tour not found"}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response(
+            {"error": str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 @extend_schema(
     responses={
