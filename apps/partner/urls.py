@@ -17,6 +17,10 @@ urlpatterns = [
     # Status and Completion
     path('status/', views.get_partner_status, name='get-partner-status'),
     path('complete-onboarding/', views.complete_onboarding, name='complete-onboarding'),
+
+    # NEW: Add the DELETE function
+    path('user/<int:user_id>/tours/<int:tour_id>/delete/', views.delete_tour, name='delete-tour'),
+
     
     # Tour Management
     path('user/<int:user_id>/tours/', views.get_all_tours, name='get-all-tours'),
