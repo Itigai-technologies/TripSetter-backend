@@ -6,7 +6,8 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from rest_framework.permissions import AllowAny
 from django.shortcuts import redirect
 
 def health_check(request):
@@ -38,9 +39,43 @@ urlpatterns = [
     path('api/partner/', include('apps.partner.urls')),
     path('api/common/', include('apps.common.urls')),
     
-    # API Documentation
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    # API Documentation (make schema public; serve UI via CDN to avoid static issues)
+    path(
+        'api/schema/',
+        SpectacularAPIView.as_view(permission_classes=[AllowAny]),
+        name='schema'
+    ),
+    path(
+        'api/docs/',
+        lambda request: HttpResponse(
+            """
+            <!doctype html>
+            <html>
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+              <title>API Docs</title>
+              <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+              <style>body { margin:0; } .swagger-ui { max-width: 100%; }</style>
+            </head>
+            <body>
+              <div id="swagger"></div>
+              <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+              <script>
+                window.ui = SwaggerUIBundle({
+                  url: '/api/schema/',
+                  dom_id: '#swagger',
+                  deepLinking: true,
+                  presets: [SwaggerUIBundle.presets.apis],
+                });
+              </script>
+            </body>
+            </html>
+            """,
+            content_type='text/html'
+        ),
+        name='swagger-ui'
+    ),
 ]
 
 # Serve media files in both development and production
