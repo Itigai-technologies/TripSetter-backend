@@ -18,8 +18,8 @@ def health_check(request):
     })
 
 def root_redirect(request):
-    """Redirect root URL to API documentation."""
-    return redirect('/api/docs/')
+    """Return a simple health payload at root to avoid docs/static issues."""
+    return health_check(request)
 
 urlpatterns = [
     # Root URL redirect

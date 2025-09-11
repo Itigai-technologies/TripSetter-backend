@@ -25,6 +25,11 @@ ALLOWED_HOSTS = [
     '*'  # Fallback for other deployments
 ]
 
+# CSRF trusted origins for reverse proxy/Render
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+]
+
 # Application definition
 DJANGO_APPS = [
     'jazzmin',
