@@ -51,3 +51,6 @@ honeypot_admin.register(User, UserAdmin)
 honeypot_urlpatterns = [
     path('', honeypot_admin.urls),
 ]
+
+# Expose standard urlpatterns variable so Django include() can import this module
+urlpatterns = honeypot_urlpatterns
